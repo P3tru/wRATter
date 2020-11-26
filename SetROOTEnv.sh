@@ -9,7 +9,7 @@ fi
 
 echo "Setting up LD_LIBRARY_PATH"
 if [ -z "$LD_LIBRARY_PATH" ]; then
-  export LD_LIBRARY_PATH=${PWD}/lib
+  export LD_LIBRARY_PATH=${PWD}
 else
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PWD}/lib
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PWD}
 fi
