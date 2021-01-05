@@ -144,8 +144,6 @@ class wRAT {
   // Get Nb of recorded triggers
   // (this depends on the rat-pac DAQ)
   unsigned GetNTriggers() { return DS->GetEVCount(); }
-  // For a trigger iTrig, get trigger time
-  double GetTriggerTime(const int &iTrig) { return DS->GetEV(iTrig)->GetCalibratedTriggerTime(); }
 
   int GetNPrimaryParticle() { return DS->GetMC()->GetMCParticleCount(); }
 
@@ -172,8 +170,6 @@ class wRAT {
 
   TVector3 GetPosRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetPosition(); }
   double GetTRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetTime(); }
-
-  double GetChi2(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetGoodness(); }
 
   double GetQ(const int &iTrig) { return DS->GetEV(iTrig)->GetTotalCharge(); }
   int GetNHits(const int &iTrig) { return DS->GetEV(iTrig)->Nhits(); }
