@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.17)
 project(wRATter)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOTSYS}/etc/cmake)
 #   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
@@ -16,7 +18,7 @@ if(NOT ROOT_FOUND)
     return()
 endif()
 
-find_package(Boost 1.57.0 COMPONENTS system filesystem REQUIRED)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -31,9 +33,9 @@ include_directories(
 #----------------------------------------------------------------------------
 # Locate RATROOT Libs
 #
+LINK_DIRECTORIES($ENV{G4LIB}/$ENV{G4SYSTEM})
 LINK_DIRECTORIES($ENV{RATROOT}/lib)
-LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/lib)
 
-
-
-add_library(wRATter SHARED wRATter.cpp include/Wrapper.hh include/Hit.hh)
+add_executable(wRATter ReadFile.cc)
+set_target_properties(wRATter PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(wRATter ${ROOT_LIBRARIES} ${Boost_LIBRARIES} RATEvent)
