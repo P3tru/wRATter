@@ -84,4 +84,16 @@ bool operator>(const Hit& h1, const Hit&h2){
   return h1.T>h2.T;
 }
 
+int GetNHits(const std::vector<Hit>& vHits){
+  return vHits.size();
+}
+
+double GetQ(const std::vector<Hit>& vHits){
+  double sumQ=0.;
+  for(const auto& h: vHits){
+	sumQ+=h.Q;
+  }
+  return sumQ;
+}
+
 #endif //_HIT_HH_
