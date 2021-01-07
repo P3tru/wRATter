@@ -20,13 +20,13 @@
 #include "Hit.hh"
 
 class wRAT {
- protected:
+protected:
   TChain *ChT;
   TChain *ChRunT;
 
   RAT::DS::Run *RUN;
   RAT::DS::Root *DS;
- public:
+public:
 
   // ########################################## //
   // #### #### #### CONSTRUCTORS #### #### #### //
@@ -34,67 +34,67 @@ class wRAT {
 
   wRAT() {
 
-	ChT = new TChain("T");
-	ChRunT = new TChain("runT");
+    ChT = new TChain("T");
+    ChRunT = new TChain("runT");
 
-	RUN = new RAT::DS::Run();
-	DS = new RAT::DS::Root();
+    RUN = new RAT::DS::Run();
+    DS = new RAT::DS::Root();
 
   };
 
   explicit wRAT(const std::string& filename) : wRAT() {
 
-	ChT->Add(filename.c_str());
-	ChRunT->Add(filename.c_str());
+    ChT->Add(filename.c_str());
+    ChRunT->Add(filename.c_str());
 
-	ChRunT->SetBranchAddress("run", &RUN);
-	ChRunT->GetEntry(0);
+    ChRunT->SetBranchAddress("run", &RUN);
+    ChRunT->GetEntry(0);
 
-	ChT->SetBranchAddress("ds", &DS);
+    ChT->SetBranchAddress("ds", &DS);
 
   }
 
   explicit wRAT(const char *filename) : wRAT() {
 
-	ChT->Add(filename);
-	ChRunT->Add(filename);
+    ChT->Add(filename);
+    ChRunT->Add(filename);
 
-	ChRunT->SetBranchAddress("run", &RUN);
-	ChRunT->GetEntry(0);
+    ChRunT->SetBranchAddress("run", &RUN);
+    ChRunT->GetEntry(0);
 
-	ChT->SetBranchAddress("ds", &DS);
+    ChT->SetBranchAddress("ds", &DS);
 
   }
 
   explicit wRAT(const std::vector<std::string> &vFiles) : wRAT() {
 
-	for (const auto &file:vFiles) {
+    for (const auto &file:vFiles) {
 
-	  ChT->Add(file.c_str());
-	  ChRunT->Add(file.c_str());
+      ChT->Add(file.c_str());
+      ChRunT->Add(file.c_str());
 
-	}
+    }
 
-	ChRunT->SetBranchAddress("run", &RUN);
-	ChRunT->GetEntry(0);
+    ChRunT->SetBranchAddress("run", &RUN);
+    ChRunT->GetEntry(0);
 
-	ChT->SetBranchAddress("ds", &DS);
+    ChT->SetBranchAddress("ds", &DS);
 
   }
 
   explicit wRAT(const std::vector<const char *> &vFiles) : wRAT() {
 
-	for (const auto &file:vFiles) {
+    for (const auto &file:vFiles) {
 
-	  ChT->Add(file);
-	  ChRunT->Add(file);
+      ChT->Add(file);
+      ChRunT->Add(file);
 
-	}
+    }
 
-	ChRunT->SetBranchAddress("run", &RUN);
-	ChRunT->GetEntry(0);
+    ChRunT->SetBranchAddress("run", &RUN);
+    ChRunT->GetEntry(0);
 
-	ChT->SetBranchAddress("ds", &DS);
+    ChT->SetBranchAddress("ds", &DS);
 
   }
 
@@ -103,11 +103,11 @@ class wRAT {
   // ######################################### //
 
   virtual ~wRAT() {
-	delete RUN;
-	delete DS;
+    delete RUN;
+    delete DS;
 
-	delete ChRunT;
-	delete ChT;
+    delete ChRunT;
+    delete ChT;
   }
 
   // ############################################### //
@@ -144,24 +144,22 @@ class wRAT {
   // Get Nb of recorded triggers
   // (this depends on the rat-pac DAQ)
   unsigned GetNTriggers() { return DS->GetEVCount(); }
-  // For a trigger iTrig, get trigger time
-  double GetTriggerTime(const int &iTrig) { return DS->GetEV(iTrig)->GetCalibratedTriggerTime(); }
 
   int GetNPrimaryParticle() { return DS->GetMC()->GetMCParticleCount(); }
 
   // Get TRUE primary particle info
   void GetPrimaryParticleInfo(const double &TriggerTime,
-							  TVector3 &Pos, TVector3 &Dir,
-							  double &E,
-							  double &T) {
+			      TVector3 &Pos, TVector3 &Dir,
+			      double &E,
+			      double &T) {
 
-	auto nParticle = GetNPrimaryParticle();
-	auto iParticle = nParticle > 1 ? (TriggerTime > 1e3 ? 1 : 0) : 0;
+    auto nParticle = GetNPrimaryParticle();
+    auto iParticle = nParticle > 1 ? (TriggerTime > 1e3 ? 1 : 0) : 0;
 
-	Pos = DS->GetMC()->GetMCParticle(iParticle)->GetPosition();
-	Dir = DS->GetMC()->GetMCParticle(iParticle)->GetMomentum().Unit();
-	E = DS->GetMC()->GetMCParticle(iParticle)->GetKE();
-	T = DS->GetMC()->GetMCParticle(iParticle)->GetTime();
+    Pos = DS->GetMC()->GetMCParticle(iParticle)->GetPosition();
+    Dir = DS->GetMC()->GetMCParticle(iParticle)->GetMomentum().Unit();
+    E = DS->GetMC()->GetMCParticle(iParticle)->GetKE();
+    T = DS->GetMC()->GetMCParticle(iParticle)->GetTime();
 
   }
 
@@ -173,38 +171,34 @@ class wRAT {
   TVector3 GetPosRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetPosition(); }
   double GetTRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetTime(); }
 
-  double GetChi2(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetGoodness(); }
-
   double GetQ(const int &iTrig) { return DS->GetEV(iTrig)->GetTotalCharge(); }
   int GetNHits(const int &iTrig) { return DS->GetEV(iTrig)->Nhits(); }
 
   std::vector<Hit> GetVHits(const int &iTrig) {
 
-	std::vector<Hit> vHit;
-	auto EV = DS->GetEV(iTrig);
-	auto nPMTs = EV->GetPMTCount();
+    std::vector<Hit> vHit;
+    auto EV = DS->GetEV(iTrig);
+    auto nPMTs = EV->GetPMTCount();
 
-	for (auto iPMT = 0; iPMT < nPMTs; iPMT++) {
+    for (auto iPMT = 0; iPMT < nPMTs; iPMT++) {
 
-	  auto PMT = EV->GetPMT(iPMT);
-	  auto ID = PMT->GetID();
+      auto PMT = EV->GetPMT(iPMT);
+      auto ID = PMT->GetID();
 
-	  const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
-	  if (PMTType == 1) {
+      const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
 
-		auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
-		auto QHit = PMT->GetCharge();
-		auto T = PMT->GetTime();
+      auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+      auto QHit = PMT->GetCharge();
+      auto T = PMT->GetTime();
 
-		Hit hit(Pos, QHit, T);
+      Hit hit(Pos, QHit, T);
 
-		vHit.emplace_back(hit);
+      vHit.emplace_back(hit);
 
-	  }
 
-	}
+    }
 
-	return vHit;
+    return vHit;
   }
 
 };
