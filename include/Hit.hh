@@ -14,7 +14,7 @@
 
 #define PI 3.14159265359
 #define RINDEX_WATER 1.33
-#define SOL_VACUUM 299.792
+#define SOL_VACUUM 299.792 // mm/ns
 #define SOL SOL_VACUUM/RINDEX_WATER
 
 
@@ -94,6 +94,27 @@ double GetQ(const std::vector<Hit>& vHits){
     sumQ+=h.Q;
   }
   return sumQ;
+}
+
+int GetNPrompts(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
+  std::size_t nPrompts=0;
+  for(auto& hit:vHits){
+	if(hit.T < TCutPrompt){
+	  nPrompts++;
+	}
+  }
+  return nPrompts;
+}
+
+std::vector<Hit> GetVPromptHits(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
+  std::vector<Hit> vPrompt;
+  for(auto& hit:vHits){
+    if(hit.T < TCutPrompt){
+      vPrompt.emplace_back(hit);
+    }
+  }
+  std::sort(vPrompt.begin(), vPrompt.end());
+  return vPrompt;
 }
 
 double fweight(const Hit& hit, const unsigned int& wPower = 1){
