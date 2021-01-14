@@ -191,14 +191,14 @@ public:
 
       const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
 
-      auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
-      auto QHit = PMT->GetCharge();
-      auto T = PMT->GetTime();
+	  if (PMTType == 1) {
+		auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+		auto QHit = PMT->GetCharge();
+		auto T = PMT->GetTime();
+		Hit hit(Pos, QHit, T);
 
-      Hit hit(Pos, QHit, T);
-
-      vHit.emplace_back(hit);
-
+		vHit.emplace_back(hit);
+	  }
 
     }
 
