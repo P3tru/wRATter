@@ -205,6 +205,34 @@ public:
     return vHit;
   }
 
+  std::map<unsigned int, Hit> GetMHits(const int& iTrig){
+
+    std::map<unsigned int, Hit> mHits;
+
+	auto EV = DS->GetEV(iTrig);
+	auto nPMTs = EV->GetPMTCount();
+
+	for (auto iPMT = 0; iPMT < nPMTs; iPMT++) {
+
+	  auto PMT = EV->GetPMT(iPMT);
+	  auto ID = PMT->GetID();
+
+	  const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
+
+	  if (PMTType == 1) {
+		auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+		auto QHit = PMT->GetCharge();
+		auto T = PMT->GetTime();
+		Hit hit(Pos, QHit, T);
+		mHits.insert(std::make_pair(ID, hit));
+	  }
+
+	}
+
+	return mHits;
+
+  }
+
 };
 
 #endif //WRATTER_LIBRARY_H

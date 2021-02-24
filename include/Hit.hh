@@ -9,8 +9,12 @@
 // #### #### ####   C/C++   #### #### #### //
 // ####################################### //
 #include <iostream>
+#include <string>
 
 #include <TVector3.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TH3D.h>
 
 #define PI 3.14159265359
 #define RINDEX_WATER 1.33
@@ -88,14 +92,6 @@ int GetNHits(const std::vector<Hit>& vHits){
   return vHits.size();
 }
 
-double GetQ(const std::vector<Hit>& vHits){
-  double sumQ=0.;
-  for(const auto& h: vHits){
-    sumQ+=h.Q;
-  }
-  return sumQ;
-}
-
 int GetNPrompts(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
   std::size_t nPrompts=0;
   for(auto& hit:vHits){
@@ -105,6 +101,22 @@ int GetNPrompts(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/
   }
   return nPrompts;
 }
+
+double GetQ(const std::vector<Hit>& vHits){
+  double sumQ=0.;
+  for(const auto& h: vHits){
+    sumQ+=h.Q;
+  }
+  return sumQ;
+}
+
+static double GetQ2(const std::vector<Hit>& vHits){
+  double sumQ2=0.;
+  for(const auto& hit:vHits)
+	sumQ2+=hit.Q*hit.Q;
+  return sumQ2;
+}
+
 
 std::vector<Hit> GetVPromptHits(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
   std::vector<Hit> vPrompt;
@@ -119,6 +131,67 @@ std::vector<Hit> GetVPromptHits(const std::vector<Hit>& vHits, const int& TCutPr
 
 double fweight(const Hit& hit, const unsigned int& wPower = 1){
   return wPower > 0 ? std::pow(hit.Q, wPower) : 1;
+}
+
+TH1D* GetTResHist(const std::string& tag, const std::vector<Hit>& vHits,
+				  const TVector3& Pos, const double& T,
+				  const unsigned int wPower = 1,
+				  const unsigned int& nBins = 600, const double& min = -200, const double& max = 400){
+
+  TH1D *hExp = new TH1D(Form("hTRes_%s", tag.c_str()), tag.c_str(), nBins, min, max);
+
+  // Fill histogram to calculate NLL TRes
+  for(auto& hit:vHits){
+	hExp->Fill(hit.GetTRes(Pos, T), fweight(hit, wPower));
+  }
+
+  return hExp;
+
+}
+
+TH1D* GetTResHist(const std::string& tag, const std::vector<Hit>& vHits,
+				  const std::vector<double>& x,
+				  const unsigned int wPower = 1,
+				  const unsigned int& nBins = 600, const double& min = -200, const double& max = 400){
+
+  TH1D *hExp = new TH1D(Form("hTRes_%s", tag.c_str()), tag.c_str(), nBins, min, max);
+
+  // Fill histogram to calculate NLL TRes
+  for(auto& hit:vHits){
+	hExp->Fill(hit.GetTRes(TVector3(x[0], x[1], x[2]), x[3]), fweight(hit, wPower));
+  }
+
+  return hExp;
+
+}
+
+TH3D* GetEventHist(const std::string& tag, const std::vector<Hit>& vHits, const TVector3& vBnds) {
+
+  auto hEvt = new TH3D(Form("h3Evt_%s", tag.c_str()), " ; x [mm] ; y [mm] ; z [mm]",
+					   10, -vBnds.x(), vBnds.x(),
+					   10, -vBnds.y(), vBnds.y(),
+					   10, -vBnds.z(), vBnds.z());
+
+  for(auto& hit: vHits) {
+    hEvt->Fill(hit.PMTPos.x(), hit.PMTPos.y(), hit.PMTPos.z(), hit.Q);
+  }
+
+  return hEvt;
+
+}
+
+TH2D* GetBarrelEventHist(const std::string& tag, const std::vector<Hit>& vHits, const double& z){
+
+  auto hEvt = new TH2D(Form("h2Evt_%s", tag.c_str()), " ; #Phi [rad] ; z [mm]",
+					   100, -1., 1.,
+					   100, -z, z);
+
+  for(auto& hit: vHits) {
+	hEvt->Fill(hit.PMTPos.Phi(), hit.PMTPos.z(), hit.Q);
+  }
+
+  return hEvt;
+
 }
 
 
