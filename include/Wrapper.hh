@@ -178,7 +178,7 @@ public:
   double GetQ(const int &iTrig) { return DS->GetEV(iTrig)->GetTotalCharge(); }
   int GetNHits(const int &iTrig) { return DS->GetEV(iTrig)->Nhits(); }
 
-  std::vector<Hit> GetVHits(const int &iTrig) {
+  std::vector<Hit> GetVHits(const int& iTrig, const double& TTrigCut = 0.) {
 
     std::vector<Hit> vHit;
     auto EV = DS->GetEV(iTrig);
@@ -192,20 +192,22 @@ public:
       const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
 
 	  if (PMTType == 1) {
-		auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
-		auto QHit = PMT->GetCharge();
 		auto T = PMT->GetTime();
-		Hit hit(Pos, QHit, T);
-
-		vHit.emplace_back(hit);
+		if(T>TTrigCut){
+		  auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+		  auto QHit = PMT->GetCharge();
+		  Hit hit(Pos, QHit, T);
+		  vHit.emplace_back(hit);
+		}
 	  }
 
     }
 
     return vHit;
+
   }
 
-  std::map<unsigned int, Hit> GetMHits(const int& iTrig){
+  std::map<unsigned int, Hit> GetMHits(const int& iTrig, const double& TTrigCut = 0.){
 
     std::map<unsigned int, Hit> mHits;
 
@@ -230,6 +232,26 @@ public:
 	}
 
 	return mHits;
+
+  }
+
+  TH1D* GetHTRes(const int& iTrig, const std::string& tag = "hTRes",
+				 const int& nBins = 600, const double& min =-200., const double& max = 400.) {
+
+    TH1D* hTRes = new TH1D(tag.c_str(), " ; T_{Res} [ns] ; Counts ",
+						   nBins, min, max);
+
+	const auto TrigTime = GetTriggerTime(iTrig);
+	auto iParticle = GetNPrimaryParticle() > 1 ? (TrigTime > 1e3 ? 1 : 0) : 0;
+
+	auto vHits = GetVHits(iTrig);
+
+    for(auto& h:vHits){
+	  if(h.T>0.)
+		hTRes->Fill(h.GetTRes(GetPosTrue(iParticle), -TrigTime));
+    }
+
+	return hTRes;
 
   }
 
