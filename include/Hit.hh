@@ -100,5 +100,25 @@ double fweight(const Hit& hit, int wPower = 1){
   return wPower > 0 ? std::pow(hit.Q, wPower) : 1;
 }
 
+void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh){
+
+  // Sort hits by time
+  std::sort(vHits.begin(), vHits.end());
+
+  // Get first hit above threshold
+  auto itTrigHit = std::lower_bound(vHits.begin(), vHits.end(), QThresh,
+				    [](const Hit& hit, double val){
+				      return hit.Q < val;
+				    });
+
+  double TTrig = itTrigHit->T;
+
+  // Offset every hit from trig hit
+  std::for_each(vHits.begin(), vHits.end(),
+		[&TTrig](Hit& hit){
+		  hit.T -= TTrig;
+		});
+
+}
 
 #endif //_HIT_HH_
