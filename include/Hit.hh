@@ -96,7 +96,7 @@ double GetQ(const std::vector<Hit>& vHits){
   return sumQ;
 }
 
-double fweight(const Hit& hit, int wPower = 1){
+double fweight(const Hit& hit, const unsigned int& wPower = 1){
   return wPower > 0 ? std::pow(hit.Q, wPower) : 1;
 }
 
