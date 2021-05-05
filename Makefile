@@ -23,7 +23,7 @@ ROOTLIBS   := $(shell root-config --libs)
 RATLIBS  := -L$(RATROOT)/lib -lRATEvent
 
 ### BOOST
-ifeq ($(NAME), 'nino')
+ifeq ($(NAME), nino)
 BOOSTCFLAGS := -I/data/snoplus/home/zsoldos/.local/boost-1.71.0
 BOOSTLIBS   := -L/data/snoplus/home/zsoldos/.local/boost-1.71.0/lib -lboost_system -lboost_filesystem
 else

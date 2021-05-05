@@ -144,8 +144,6 @@ public:
   // Get Nb of recorded triggers
   // (this depends on the rat-pac DAQ)
   unsigned GetNTriggers() { return DS->GetEVCount(); }
-  // For a trigger iTrig, get trigger time
-  double GetTriggerTime(const int &iTrig) { return DS->GetEV(iTrig)->GetCalibratedTriggerTime(); }
 
   int GetNPrimaryParticle() { return DS->GetMC()->GetMCParticleCount(); }
 
@@ -173,8 +171,6 @@ public:
   TVector3 GetPosRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetPosition(); }
   double GetTRec(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetTime(); }
 
-  double GetChi2(const int &iTrig) { return DS->GetEV(iTrig)->GetPathFit()->GetGoodness(); }
-  
   double GetQ(const int &iTrig) { return DS->GetEV(iTrig)->GetTotalCharge(); }
   int GetNHits(const int &iTrig) { return DS->GetEV(iTrig)->Nhits(); }
 
@@ -191,15 +187,13 @@ public:
 
       const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
 
-	  if (PMTType == 1) {
-		auto T = PMT->GetTime();
-		if(T>TTrigCut){
-		  auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
-		  auto QHit = PMT->GetCharge();
-		  Hit hit(Pos, QHit, T);
-		  vHit.emplace_back(hit);
-		}
-	  }
+      auto T = PMT->GetTime();
+      if(T>TTrigCut){
+	auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+	auto QHit = PMT->GetCharge();
+	Hit hit(Pos, QHit, T);
+	vHit.emplace_back(hit);
+      }
 
     }
 
@@ -211,47 +205,45 @@ public:
 
     std::map<unsigned int, Hit> mHits;
 
-	auto EV = DS->GetEV(iTrig);
-	auto nPMTs = EV->GetPMTCount();
+    auto EV = DS->GetEV(iTrig);
+    auto nPMTs = EV->GetPMTCount();
 
-	for (auto iPMT = 0; iPMT < nPMTs; iPMT++) {
+    for (auto iPMT = 0; iPMT < nPMTs; iPMT++) {
 
-	  auto PMT = EV->GetPMT(iPMT);
-	  auto ID = PMT->GetID();
+      auto PMT = EV->GetPMT(iPMT);
+      auto ID = PMT->GetID();
 
-	  const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
+      const auto PMTType = RUN->GetPMTInfo()->GetType(ID);
 
-	  if (PMTType == 1) {
-		auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
-		auto QHit = PMT->GetCharge();
-		auto T = PMT->GetTime();
-		Hit hit(Pos, QHit, T);
-		mHits.insert(std::make_pair(ID, hit));
-	  }
+      auto Pos = RUN->GetPMTInfo()->GetPosition(ID);
+      auto QHit = PMT->GetCharge();
+      auto T = PMT->GetTime();
+      Hit hit(Pos, QHit, T);
+      mHits.insert(std::make_pair(ID, hit));
 
-	}
+    }
 
-	return mHits;
+    return mHits;
 
   }
 
   TH1D* GetHTRes(const int& iTrig, const std::string& tag = "hTRes",
-				 const int& nBins = 600, const double& min =-200., const double& max = 400.) {
+		 const int& nBins = 600, const double& min =-200., const double& max = 400.) {
 
     TH1D* hTRes = new TH1D(tag.c_str(), " ; T_{Res} [ns] ; Counts ",
-						   nBins, min, max);
+			   nBins, min, max);
 
-	const auto TrigTime = GetTriggerTime(iTrig);
-	auto iParticle = GetNPrimaryParticle() > 1 ? (TrigTime > 1e3 ? 1 : 0) : 0;
+    const auto TrigTime = 0.;
+    auto iParticle = GetNPrimaryParticle() > 1 ? (TrigTime > 1e3 ? 1 : 0) : 0;
 
-	auto vHits = GetVHits(iTrig);
+    auto vHits = GetVHits(iTrig);
 
     for(auto& h:vHits){
-	  if(h.T>0.)
-		hTRes->Fill(h.GetTRes(GetPosTrue(iParticle), -TrigTime));
+      if(h.T>0.)
+	hTRes->Fill(h.GetTRes(GetPosTrue(iParticle), -TrigTime));
     }
 
-	return hTRes;
+    return hTRes;
 
   }
 
