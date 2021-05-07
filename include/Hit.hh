@@ -194,24 +194,53 @@ TH2D* GetBarrelEventHist(const std::string& tag, const std::vector<Hit>& vHits, 
 
 }
 
-void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh){
+void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh, double& TTrig){
+
+  // vHits.begin()->Print();
+  // std::cout << std::endl;
 
   // Sort hits by time
   std::sort(vHits.begin(), vHits.end());
 
+  // for(const auto& hit: vHits)
+  //   hit.Print();
+  // std::cout << std::endl;
+  
   // Get first hit above threshold
+  Hit TrigHit;
+  for(const auto& hit: vHits){
+    if(hit.Q > QThresh){
+      TrigHit = hit;
+      break;
+    }
+  }
+  
+  // TrigHit.Print();  
+  // std::cout << std::endl;
+
+  // vHits.begin()->Print();
+  // std::cout << std::endl;
+
   auto itTrigHit = std::lower_bound(vHits.begin(), vHits.end(), QThresh,
 				    [](const Hit& hit, double val){
-				      return hit.Q < val;
+				      return hit.Q > val;
 				    });
 
-  double TTrig = itTrigHit->T;
+
+  // itTrigHit->Print();
+  // std::cout << std::endl;
+  
+  TTrig = TrigHit.T;
 
   // Offset every hit from trig hit
   std::for_each(vHits.begin(), vHits.end(),
 		[&TTrig](Hit& hit){
 		  hit.T -= TTrig;
 		});
+
+  // for(const auto& hit: vHits)
+  //   hit.Print();
+  // std::cout << std::endl;
 
 }
 
