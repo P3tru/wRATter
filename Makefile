@@ -50,5 +50,8 @@ all: ReadFile
 ReadFile:
 	$(CXX) $(CPPFLAGS) ReadFile.cc -o $@ $(EXTRALIBS)
 
+ReadThread:
+	$(CXX) $(CPPFLAGS) ReadThread.cc -o $@ $(EXTRALIBS)
+
 clean:
-	$(RM) ReadFile
+	$(RM) ReadFile ReadThread

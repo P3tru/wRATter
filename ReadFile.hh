@@ -78,5 +78,4 @@ static void ProcessArgs(TApplication &theApp,
 
 }
 
-
 #endif //_READFILE_HH_

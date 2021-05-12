@@ -39,3 +39,7 @@ LINK_DIRECTORIES($ENV{RATROOT}/lib)
 add_executable(wRATter ReadFile.cc)
 set_target_properties(wRATter PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(wRATter ${ROOT_LIBRARIES} ${Boost_LIBRARIES} RATEvent)
+
+add_executable(ReadThread ReadThread.cc)
+set_target_properties(ReadThread PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(ReadThread ${ROOT_LIBRARIES} ${Boost_LIBRARIES} RATEvent)
