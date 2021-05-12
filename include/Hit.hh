@@ -21,13 +21,25 @@
 #define SOL_VACUUM 299.792 // mm/ns
 #define SOL SOL_VACUUM/RINDEX_WATER
 
+namespace HitUtils {
+
+  static const double GetPI(){
+    return PI;
+  }
+
+  static const double GetSOL(){
+    return SOL;
+  }
+
+}
+
 
 static double rad2deg(double angrad){
-  return angrad*180/PI;
+  return angrad*180/HitUtils::GetPI();
 }
 
 static double deg2rad(double angdeg){
-  return angdeg*PI/180;
+  return angdeg*HitUtils::GetPI()/180;
 }
 
 
@@ -54,15 +66,15 @@ typedef struct Hit {
   double GetD(const TVector3& OrigPos) const {
     return (PMTPos - OrigPos).Mag();
   };
-  double GetTRes(const TVector3& OrigPos, const double& OrigT, const double& SoL=SOL) const {
+  double GetTRes(const TVector3& OrigPos, const double& OrigT, const double& SoL=HitUtils::GetSOL()) const {
     return T-OrigT - GetD(OrigPos)/SoL;
   };
   double GetCosTheta(const TVector3& OrigPos, const TVector3& OrigDir) const {
     return OrigDir.Dot(PMTPos-OrigPos) / (PMTPos-OrigPos).Mag();
   };
   void Print() const {
-    std::cout << T << " "
-	      << Q << " ";
+    std::cout << T << "ns "
+	      << Q << "Q ";
     PMTPos.Print();
   }
 
@@ -92,7 +104,8 @@ int GetNHits(const std::vector<Hit>& vHits){
   return vHits.size();
 }
 
-int GetNPrompts(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
+int GetNPrompts(const std::vector<Hit>& vHits,
+		const int& TCutPrompt = std::numeric_limits<int>::max()/*ns*/){
   std::size_t nPrompts=0;
   for(auto& hit:vHits){
     if(hit.T < TCutPrompt){
@@ -102,23 +115,8 @@ int GetNPrompts(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/
   return nPrompts;
 }
 
-double GetQ(const std::vector<Hit>& vHits){
-  double sumQ=0.;
-  for(const auto& h: vHits){
-    sumQ+=h.Q;
-  }
-  return sumQ;
-}
-
-static double GetQ2(const std::vector<Hit>& vHits){
-  double sumQ2=0.;
-  for(const auto& hit:vHits)
-    sumQ2+=hit.Q*hit.Q;
-  return sumQ2;
-}
-
-
-std::vector<Hit> GetVPromptHits(const std::vector<Hit>& vHits, const int& TCutPrompt = 2.0/*ns*/){
+std::vector<Hit> GetVPromptHits(const std::vector<Hit>& vHits,
+				const int& TCutPrompt = std::numeric_limits<int>::max()/*ns*/){
   std::vector<Hit> vPrompt;
   for(auto& hit:vHits){
     if(hit.T < TCutPrompt){
@@ -196,15 +194,8 @@ TH2D* GetBarrelEventHist(const std::string& tag, const std::vector<Hit>& vHits, 
 
 void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh, double& TTrig){
 
-  // vHits.begin()->Print();
-  // std::cout << std::endl;
-
   // Sort hits by time
   std::sort(vHits.begin(), vHits.end());
-
-  // for(const auto& hit: vHits)
-  //   hit.Print();
-  // std::cout << std::endl;
   
   // Get first hit above threshold
   Hit TrigHit;
@@ -214,22 +205,7 @@ void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh, double& TTri
       break;
     }
   }
-  
-  // TrigHit.Print();  
-  // std::cout << std::endl;
 
-  // vHits.begin()->Print();
-  // std::cout << std::endl;
-
-  auto itTrigHit = std::lower_bound(vHits.begin(), vHits.end(), QThresh,
-				    [](const Hit& hit, double val){
-				      return hit.Q > val;
-				    });
-
-
-  // itTrigHit->Print();
-  // std::cout << std::endl;
-  
   TTrig = TrigHit.T;
 
   // Offset every hit from trig hit
@@ -237,10 +213,6 @@ void ReTriggerVHits(std::vector<Hit>& vHits, const double& QThresh, double& TTri
 		[&TTrig](Hit& hit){
 		  hit.T -= TTrig;
 		});
-
-  // for(const auto& hit: vHits)
-  //   hit.Print();
-  // std::cout << std::endl;
 
 }
 
