@@ -23,16 +23,15 @@
 
 namespace HitUtils {
 
-  static const double GetPI(){
+  static double GetPI(){
     return PI;
   }
 
-  static const double GetSOL(){
+  static double GetSOL(){
     return SOL;
   }
 
 }
-
 
 static double rad2deg(double angrad){
   return angrad*180/HitUtils::GetPI();
