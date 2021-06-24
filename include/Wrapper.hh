@@ -178,7 +178,7 @@ public:
   double GetQ(const int &iTrig) { return DS->GetEV(iTrig)->GetTotalCharge(); }
   int GetNHits(const int &iTrig) { return DS->GetEV(iTrig)->Nhits(); }
 
-  std::vector<Hit> GetVHits(const int& iTrig, const double& TTrigCut = 0.) {
+  std::vector<Hit> GetVHits(const int& iTrig, const double& TTrigCut = -std::numeric_limits<double>::max()) {
 
     std::vector<Hit> vHit;
     auto EV = DS->GetEV(iTrig);
