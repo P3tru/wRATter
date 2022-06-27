@@ -1,24 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
-project(wRATter)
+project(wRATter VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-# You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
-#   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{ROOTSYS}/etc/cmake)
-#   - ROOT built with CMake. Add in CMAKE_PREFIX_PATH the installation prefix for ROOT
-#list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS RIO Net)
-#find_package(ROOT CONFIG REQUIRED)
+find_package(ROOT 6.24 CONFIG REQUIRED)
 if(NOT ROOT_FOUND)
     message(STATUS "ROOT package not found.")
     return()
 endif()
-
-find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -26,7 +17,6 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 include_directories(
         ${PROJECT_SOURCE_DIR}/include
         ${ROOT_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
         $ENV{RATROOT}/include
 )
 
@@ -36,10 +26,8 @@ include_directories(
 LINK_DIRECTORIES($ENV{G4LIB}/$ENV{G4SYSTEM})
 LINK_DIRECTORIES($ENV{RATROOT}/lib)
 
-add_executable(wRATter ReadFile.cc)
-set_target_properties(wRATter PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(wRATter ${ROOT_LIBRARIES} ${Boost_LIBRARIES} RATEvent)
+add_library(wRATter src/wRATter/Wrapper.cc)
+target_link_libraries(wRATter ROOT::Physics ROOT::Hist ROOT::RIO ROOT::Tree RATEvent)
 
-add_executable(ReadThread ReadThread.cc)
-set_target_properties(ReadThread PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(ReadThread ${ROOT_LIBRARIES} ${Boost_LIBRARIES} RATEvent)
+add_executable(ROOT2CSV ROOT2CSV.cc)
+target_link_libraries(ROOT2CSV wRATter)
