@@ -28,6 +28,3 @@ LINK_DIRECTORIES($ENV{RATROOT}/lib)
 
 add_library(wRATter src/wRATter/Wrapper.cc)
 target_link_libraries(wRATter ROOT::Physics ROOT::Hist ROOT::RIO ROOT::Tree RATEvent)
-
-add_executable(ROOT2CSV ROOT2CSV.cc)
-target_link_libraries(ROOT2CSV wRATter)
