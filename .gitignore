@@ -84,5 +84,4 @@ CTestTestfile.cmake
 _deps
 
 # EXE
-ReadFile
-ReadThread
+build
