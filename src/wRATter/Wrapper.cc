@@ -167,3 +167,7 @@ bool wRAT::GetPrevTrigger() {
 std::string wRAT::GetTag() const {
   return Form("%d_%d", iEvt, iTrig);
 }
+
+int wRAT::GetNPMTs() {
+  return RUN->GetPMTInfo()->GetPMTCount();
+}

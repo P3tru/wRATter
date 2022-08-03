@@ -75,6 +75,9 @@ class wRAT {
   // For a trigger iTrig, get trigger time
   double GetTriggerTime();
 
+  // Get N PMTS
+  int GetNPMTs();
+
   // Get TRUE primary particle info
   int GetNPrimaryParticle();
   TVector3 GetPosTrue(int iParticle);
