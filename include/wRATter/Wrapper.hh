@@ -105,6 +105,9 @@ class wRAT {
   // Returns true if there is a previous trigger
   bool GetPrevTrigger();
 
+  // Create tag from Event and Trigger number
+  std::string GetTag() const;
+
 
 
 };

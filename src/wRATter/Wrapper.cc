@@ -163,3 +163,7 @@ bool wRAT::GetPrevTrigger() {
 	return false;
   }
 }
+
+std::string wRAT::GetTag() const {
+  return Form("%d_%d", iEvt, iTrig);
+}
