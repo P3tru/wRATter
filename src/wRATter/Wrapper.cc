@@ -124,7 +124,7 @@ void wRAT::GetPrimaryParticleInfo(double &TriggerTime, TVector3 &Pos, TVector3 &
 }
 
 double wRAT::GetQ() { return DS->GetEV(iTrig)->GetTotalCharge(); }
-int wRAT::GetNHits(){ return DS->GetEV(iTrig)->Nhits(); }
+int wRAT::GetNHits(){ return DS->GetEV(iTrig)->GetPMTCount(); }
 
 bool wRAT::GetNextEvent() {
   if (iEvt < GetNEvts()) {
