@@ -86,7 +86,6 @@ int wRAT::GetITrig() const {
 }
 
 void wRAT::SetEvt(int i) {
-  iEvt = i;
   ChT->GetEntry(iEvt);
 }
 
