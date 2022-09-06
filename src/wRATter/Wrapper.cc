@@ -10,8 +10,8 @@ void wRAT::Init() {
   RUN = new RAT::DS::Run();
   DS = new RAT::DS::Root();
   EV = new RAT::DS::EV();
-  iEvt = 0;
-  iTrig = 0;
+  iEvt = -1;
+  iTrig = -1;
 }
 void wRAT::ReadFile(const char *filename) {
   ChT->Add(filename);
@@ -86,7 +86,7 @@ int wRAT::GetITrig() const {
 }
 
 void wRAT::SetEvt(int i) {
-  ChT->GetEntry(iEvt);
+  ChT->GetEntry(i);
 }
 
 long wRAT::GetNEvts() {
@@ -126,40 +126,40 @@ double wRAT::GetQ() { return DS->GetEV(iTrig)->GetTotalCharge(); }
 int wRAT::GetNHits(){ return DS->GetEV(iTrig)->GetPMTCount(); }
 
 bool wRAT::GetNextEvent() {
-  if (iEvt < GetNEvts()) {
-	SetEvt(iEvt++);
-	return true;
+  if (++iEvt < GetNEvts()) {
+    SetEvt(iEvt);
+    return true;
   } else {
-	return false;
+    iEvt = -1;
+  	return false;
   }
 }
 
 bool wRAT::GetPrevEvent() {
-  if (iEvt > 0) {
-	SetEvt(iEvt--);
-	return true;
+  if (--iEvt >= 0) {
+    SetEvt(iEvt);
+    return true;
   } else {
-	return false;
+    iEvt = GetNEvts();
+  	return false;
   }
 }
 
 bool wRAT::GetNextTrigger() {
-  if(iTrig < GetNTriggers()) {
-	iTrig++;
-	return true;
+  if(++iTrig < GetNTriggers()) {
+  	return true;
   } else {
-	iTrig=0;
-	return false;
+    iTrig=-1;
+    return false;
   }
 }
 
 bool wRAT::GetPrevTrigger() {
-  if(iTrig > 0) {
-	iTrig--;
-	return true;
+  if(--iTrig >= 0) {
+  	return true;
   } else {
-	iTrig=GetNTriggers();
-	return false;
+    iTrig=GetNTriggers();
+    return false;
   }
 }
 
