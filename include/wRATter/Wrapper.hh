@@ -111,7 +111,11 @@ class wRAT {
   // Create tag from Event and Trigger number
   std::string GetTag() const;
 
+  // Get iEvt
+  int GetEvt() const;
 
+  // Get iTrig
+  int GetTrig() const;
 
 };
 

@@ -170,3 +170,11 @@ std::string wRAT::GetTag() const {
 int wRAT::GetNPMTs() {
   return RUN->GetPMTInfo()->GetPMTCount();
 }
+
+int wRAT::GetEvt() const {
+  return iEvt;
+}
+
+int wRAT::GetTrig() const {
+  return iTrig;
+}
